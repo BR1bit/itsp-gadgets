@@ -26,7 +26,7 @@ Usá **siempre** `ctx.*`. Es lo único que tu gadget puede tocar del sistema:
 |---|---|
 | `ctx.escapeHtml(texto)` | Limpia texto antes de meterlo en el HTML. **Usalo con cualquier dato** (de internet, del usuario). |
 | `ctx.iconSVG('nombre')` | Devuelve el `<svg>` de un ícono Lucide para insertar en tu HTML. |
-| `ctx.apiFetch(ruta)` | Pide datos a la propia plataforma (ej. `ctx.apiFetch('/api1/notas')`). Devuelve el JSON ya parseado. |
+| `ctx.apiFetch(ruta)` | Pide datos a la propia plataforma (ej. `ctx.apiFetch('/api1/notas')`). Devuelve el JSON ya parseado. **Qué datos hay disponibles → [`DATOS.md`](DATOS.md).** |
 | `ctx.showToast(mensaje)` | Muestra un avisito abajo a la derecha. |
 | `ctx.openApp('id')` | Abre una app del escritorio. |
 | `ctx.chatConUsuario('uid')` | Abre el chat privado con alguien. |

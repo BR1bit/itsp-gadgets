@@ -30,6 +30,7 @@ registrarGadget('reloj', {
 ```
 
 - **Empezá por acá:** [`CONTRATO.md`](CONTRATO.md) — qué podés usar y cómo.
+- **Qué datos podés traer de la plataforma:** [`DATOS.md`](DATOS.md).
 - **Cómo aportar (paso a paso):** [`CONTRIBUTING.md`](CONTRIBUTING.md).
 - **Ejemplos:** [`gadgets/reloj.js`](gadgets/reloj.js) (simple) y [`gadgets/clima.js`](gadgets/clima.js) (con datos de internet).
 
