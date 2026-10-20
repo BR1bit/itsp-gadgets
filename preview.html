@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Banco de pruebas de gadgets — ITSP</title>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.js"></script>
+  <style>
+    :root { --text:#1f2430; --muted:#6b7280; --panel:#ffffff; --border:#e5e7eb; --hover:#f3f4f6;
+      --brand:#8b5cf6; --brand-rgb:139,92,246; --bg:#eceef3; }
+    @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+      --text:#e5e7eb; --muted:#9aa3b2; --panel:#13121c; --border:#2a2838; --hover:#1d1b2a; --bg:#0d0b14; } }
+    :root[data-theme="dark"] { --text:#e5e7eb; --muted:#9aa3b2; --panel:#13121c; --border:#2a2838; --hover:#1d1b2a; --bg:#0d0b14; }
+    * { box-sizing: border-box; }
+    body { margin:0; font:14px/1.5 'Inter',system-ui,sans-serif; color:var(--text); background:var(--bg); padding:24px 16px; }
+    h1 { font-size:18px; margin:0 0 4px; }
+    .sub { color:var(--muted); font-size:13px; margin:0 0 20px; }
+    .bar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+    .bar button { border:1px solid var(--border); background:var(--panel); color:var(--text); border-radius:8px;
+      padding:6px 12px; font-size:12px; font-weight:600; cursor:pointer; }
+    .grid { display:flex; flex-wrap:wrap; gap:16px; }
+    /* Mismo aspecto que la tarjeta real del escritorio */
+    .gadget { width:260px; border-radius:14px; overflow:hidden; background:var(--panel); border:1px solid var(--border);
+      box-shadow:0 8px 24px rgba(0,0,0,.08); }
+    .gd-head { display:flex; align-items:center; gap:8px; padding:10px 12px; font-weight:700; font-size:13px; border-bottom:1px solid var(--border); }
+    .gd-head svg { width:16px; height:16px; color:var(--brand); }
+    .gd-body { padding:0 12px 12px; font-size:13px; }
+    .gd-sum { font-size:12px; color:var(--muted); margin:8px 0; } .gd-sum b { color:var(--text); }
+    .gd-empty { color:var(--muted); font-size:12.5px; padding:6px 0; line-height:1.4; }
+    .gd-scroll { max-height:260px; overflow:auto; }
+    .gd-row { display:block; width:100%; text-align:left; background:transparent; border:0; color:inherit; cursor:pointer; padding:7px 0; }
+    .gd-row:hover { background:var(--hover); }
+    .gd-row-top { display:flex; justify-content:space-between; gap:8px; font-size:12.5px; margin-bottom:5px; }
+    .gd-bar { height:5px; border-radius:999px; background:rgba(var(--brand-rgb),.16); overflow:hidden; }
+    .gd-bar > div { height:100%; background:var(--brand); }
+    .gd-cmd { display:flex; gap:6px; align-items:center; background:rgba(var(--brand-rgb),.10); border:1px solid rgba(var(--brand-rgb),.22); border-radius:9px; padding:8px 9px; }
+    .gd-cmd code { font:12.5px/1.4 ui-monospace,monospace; flex:1; word-break:break-all; }
+    .gd-cmd-copy { border:0; background:transparent; color:var(--muted); cursor:pointer; }
+    .gd-cmd-desc { font-size:12px; color:var(--muted); margin-top:8px; }
+    .gd-news-title { font-size:13px; font-weight:600; } .gd-news-meta { font-size:11px; color:var(--muted); margin-top:7px; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Banco de pruebas de gadgets</h1>
+  <p class="sub">Así se van a ver tus gadgets en el escritorio. Los datos de la plataforma son de ejemplo.</p>
+  <div class="bar">
+    <button onclick="document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')">🌓 Claro / Oscuro</button>
+    <button onclick="location.reload()">↻ Recargar</button>
+  </div>
+  <div class="grid" id="grid"></div>
+
+  <script>
+    // ── Motor de prueba (imita lo justo del escritorio real) ───────────────
+    const GADGETS = {};
+    window.registrarGadget = (id, def) => { GADGETS[id] = def; };
+
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function iconSVG(name){ return `<i data-lucide="${name}"></i>`; }
+    // apiFetch de MENTIRA: devuelve datos de ejemplo para que los gadgets de la plataforma rendericen.
+    async function apiFetch(ruta){
+      if (ruta.startsWith('/api1/gadgets/progreso')) return { ok:true, certificados:3, certificados_max:12,
+        cursos:[{id:'linux',nombre:'Linux',cert:true,hechos:1,total:1},{id:'api',nombre:'APIs',cert:false,hechos:5,total:12}] };
+      if (ruta.startsWith('/api1/notas')) return { ok:true, contenido:'Nota de ejemplo…' };
+      if (ruta.startsWith('/api1/chat/online')) return { ok:true, usuarios:[{uid:'ana',nombre:'Ana Pérez'},{uid:'leo',nombre:'Leo Díaz'}] };
+      return { ok:false };
+    }
+    function showToast(m){ console.log('toast:', m); }
+    function openApp(id){ alert('(preview) abriría la app: ' + id); }
+    function chatConUsuario(uid){ alert('(preview) abriría el chat con: ' + uid); }
+    function gadgetCtx(){ return { escapeHtml, iconSVG, apiFetch, showToast, openApp, chatConUsuario }; }
+
+    // ── Cargar todos los gadgets de la carpeta y renderizarlos ─────────────
+    // (editá esta lista si agregás un archivo nuevo)
+    const ARCHIVOS = ['reloj', 'clima', 'comando', 'noticia', 'progreso', 'postit', 'online'];
+    async function cargar(){
+      for (const id of ARCHIVOS) {
+        await new Promise(res => {
+          const s = document.createElement('script');
+          s.src = 'gadgets/' + id + '.js'; s.onload = res; s.onerror = res;
+          document.head.appendChild(s);
+        });
+      }
+      const grid = document.getElementById('grid');
+      for (const id of Object.keys(GADGETS)) {
+        const g = GADGETS[id];
+        const card = document.createElement('div');
+        card.className = 'gadget';
+        card.innerHTML = `<div class="gd-head">${iconSVG(g.icon)}<span>${escapeHtml(g.name)}</span></div><div class="gd-body"></div>`;
+        grid.appendChild(card);
+        try { await g.render(card.querySelector('.gd-body'), gadgetCtx()); }
+        catch (e) { card.querySelector('.gd-body').innerHTML = '<div class="gd-empty">Error en render(): ' + escapeHtml(e.message) + '</div>'; }
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+    cargar();
+  </script>
+</body>
+</html>

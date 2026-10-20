@@ -1,0 +1,19 @@
+name: Validar gadgets
+on:
+  pull_request:
+    paths:
+      - 'gadgets/**'
+      - 'validar.js'
+  push:
+    branches: [ main ]
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Correr el validador
+        run: node validar.js
