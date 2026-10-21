@@ -32,7 +32,11 @@ registrarGadget('reloj', {
 - **Empezá por acá:** [`CONTRATO.md`](CONTRATO.md) — qué podés usar y cómo.
 - **Qué datos podés traer de la plataforma:** [`DATOS.md`](DATOS.md).
 - **Cómo aportar (paso a paso):** [`CONTRIBUTING.md`](CONTRIBUTING.md).
-- **Ejemplos:** [`gadgets/reloj.js`](gadgets/reloj.js) (simple) y [`gadgets/clima.js`](gadgets/clima.js) (con datos de internet).
+- **Ejemplos** (copiá el que más se parezca a tu idea):
+  - [`gadgets/reloj.js`](gadgets/reloj.js) — simple, sin datos externos.
+  - [`gadgets/clima.js`](gadgets/clima.js) — trae datos de **internet** (`fetch` a un dominio permitido).
+  - [`gadgets/medallas.js`](gadgets/medallas.js) — trae **tus datos** de la plataforma (`ctx.apiFetch`).
+  - [`gadgets/ranking.js`](gadgets/ranking.js) — trae datos de la **institución** (`ctx.apiFetch`).
 
 ## Probarlo sin la plataforma
 
